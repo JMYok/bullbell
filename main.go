@@ -4,6 +4,7 @@ import (
 	"bluebell/dao/mysql"
 	"bluebell/dao/redis"
 	"bluebell/logger"
+	"bluebell/pkg/snowflake"
 	"bluebell/routes"
 	"bluebell/settings"
 	"fmt"
@@ -22,11 +23,13 @@ func main() {
 	//1.加载配置文件
 	if err := settings.Init(); err != nil {
 		fmt.Printf("init settings failed,err:%v\n", zap.Error(err))
+		return
 	}
 
 	//2.初始化日志
 	if err := logger.Init(); err != nil {
 		fmt.Printf("init logger failed,err:%v\n", zap.Error(err))
+		return
 	}
 	//把缓冲区的日志追加到日志文件中
 	defer zap.L().Sync()
@@ -34,15 +37,21 @@ func main() {
 	//3.初始化Mysql
 	if err := mysql.Init(); err != nil {
 		fmt.Printf("init mysql failed,err:%v\n", zap.Error(err))
+		return
 	}
 	defer mysql.Close()
 
 	//4.初始化Redis
 	if err := redis.Init(); err != nil {
 		fmt.Printf("init redis failed,err:%v\n", zap.Error(err))
+		return
 	}
 	defer redis.Close()
 
+	if err := snowflake.Init(settings.Conf.MachineId); err != nil {
+		fmt.Printf("init snowflake failed,err:%v\n", zap.Error(err))
+		return
+	}
 	//5.注册路由
 	r := routes.Setup()
 
