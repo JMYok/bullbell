@@ -5,6 +5,7 @@ import (
 	"bluebell/models"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"go.uber.org/zap"
 	"net/http"
 )
 
@@ -15,6 +16,7 @@ func SignUpHandler(c *gin.Context) {
 
 	//shouldBindJSON只能校验数据格式、数据类型
 	if err := c.ShouldBindJSON(&p); err != nil {
+		zap.L().Error("SignUp with invalid param", zap.Error(err))
 		//判断是否为验证型错误
 		errs, ok := err.(validator.ValidationErrors)
 		if !ok {
