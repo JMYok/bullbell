@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bluebell/controllers"
 	"bluebell/dao/mysql"
 	"bluebell/dao/redis"
 	"bluebell/logger"
@@ -48,10 +49,19 @@ func main() {
 	}
 	defer redis.Close()
 
+	//雪花算法
 	if err := snowflake.Init(settings.Conf.MachineId); err != nil {
 		fmt.Printf("init snowflake failed,err:%v\n", zap.Error(err))
 		return
 	}
+
+	//参数验证器翻译器
+	err := controllers.InitTrans("zh")
+	if err != nil {
+		fmt.Printf("init validator failed,err:%v\n", zap.Error(err))
+		return
+	}
+
 	//5.注册路由
 	r := routes.Setup()
 

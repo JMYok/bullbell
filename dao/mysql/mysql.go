@@ -1,12 +1,18 @@
 package mysql
 
 import (
+	"bluebell/models"
 	"bluebell/settings"
+	"crypto/md5"
+	"encoding/hex"
+	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 )
+
+const secret = "bobJiang"
 
 var db *sqlx.DB
 
@@ -31,4 +37,34 @@ func Init() (err error) {
 
 func Close() {
 	_ = db.Close()
+}
+
+func CheckUserExistByUsername(username string) (bool, error) {
+	sqlStr := "select count(*) from user where username=?"
+	var cnt int
+	err := db.Get(&cnt, sqlStr, username)
+	if err != nil {
+		return true, err
+	}
+	return cnt > 0, nil
+}
+
+// InsertUser 插入用户数据
+func InsertUser(user *models.User) (err error) {
+	//对密码进行加密
+	password := encryptPassword(user.Password)
+	//sql操作
+	sqlStr := "insert into user(user_id,username,password) values(?,?,?)"
+	_, err = db.Exec(sqlStr, user.UserId, user.Username, password)
+	if err != nil {
+		fmt.Printf("Error:%v", err)
+		return errors.New("插入数据出错")
+	}
+	return nil
+}
+
+func encryptPassword(oPassword string) string {
+	h := md5.New()
+	h.Write([]byte(secret))
+	return hex.EncodeToString(h.Sum([]byte(oPassword)))
 }
