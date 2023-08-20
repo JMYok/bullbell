@@ -42,3 +42,12 @@ func SignUp(p *models.ParamSignUp) (err error) {
 	//返回结果
 	return nil
 }
+
+func Login(p *models.ParamLogin) (err error) {
+	//检测用户密码是否匹配
+	if err := mysql.CheckUserByUsernameAndPassword(p.Username, p.Password); err != nil {
+		return err
+	}
+	//TODO 设置session
+	return nil
+}

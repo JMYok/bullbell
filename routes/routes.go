@@ -16,8 +16,10 @@ func Setup(mode string) *gin.Engine {
 
 	//注册
 	r.POST("/signup", controllers.SignUpHandler)
+	//登录
+	r.POST("/login", controllers.LoginHandler)
 
-	r.GET("/", func(c *gin.Context) {
+	r.GET("/ping", func(c *gin.Context) {
 		c.String(200, "server work nicely")
 	})
 	return r

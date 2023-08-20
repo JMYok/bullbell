@@ -63,6 +63,22 @@ func InsertUser(user *models.User) (err error) {
 	return nil
 }
 
+func CheckUserByUsernameAndPassword(username string, password string) (err error) {
+	password = encryptPassword(password)
+	sqlStr := "select count(*) from user where username=? and password = ?"
+	var cnt int
+	err = db.Get(&cnt, sqlStr, username, password)
+	if err != nil {
+		zap.L().Error("CheckUserByUsernameAndPassword error message", zap.Error(err))
+		return err
+	}
+	if cnt <= 0 {
+		zap.L().Error("数据库查询结果为0")
+		return errors.New("密码不匹配")
+	}
+	return nil
+}
+
 func encryptPassword(oPassword string) string {
 	h := md5.New()
 	h.Write([]byte(secret))
