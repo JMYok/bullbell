@@ -36,14 +36,14 @@ func main() {
 	defer zap.L().Sync()
 
 	//3.初始化Mysql
-	if err := mysql.Init(); err != nil {
+	if err := mysql.Init(settings.Conf.MySQLConfig); err != nil {
 		fmt.Printf("init mysql failed,err:%v\n", zap.Error(err))
 		return
 	}
 	defer mysql.Close()
 
 	//4.初始化Redis
-	if err := redis.Init(); err != nil {
+	if err := redis.Init(settings.Conf.RedisConfig); err != nil {
 		fmt.Printf("init redis failed,err:%v\n", zap.Error(err))
 		return
 	}

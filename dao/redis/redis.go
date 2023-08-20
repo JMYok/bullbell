@@ -11,15 +11,15 @@ import (
 var rdb *redis.Client
 
 // Init 初始化连接
-func Init() (err error) {
+func Init(cfg *settings.RedisConfig) (err error) {
 	rdb = redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%d",
-			settings.Conf.RedisConfig.Host,
-			settings.Conf.RedisConfig.Port),
-		Password: settings.Conf.RedisConfig.Password,
+			cfg.Host,
+			cfg.Port),
+		Password: cfg.Password,
 		// use default DB
-		DB:       settings.Conf.RedisConfig.DB,
-		PoolSize: settings.Conf.RedisConfig.PoolSize,
+		DB:       cfg.DB,
+		PoolSize: cfg.PoolSize,
 	})
 
 	_, err = rdb.Ping().Result()
