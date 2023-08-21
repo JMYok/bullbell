@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 // SignUpHandler 处理注册请求的函数
@@ -20,29 +19,21 @@ func SignUpHandler(c *gin.Context) {
 		//判断是否为验证型错误
 		errs, ok := err.(validator.ValidationErrors)
 		if !ok {
-			c.JSON(http.StatusOK, gin.H{
-				"msg": "invalid param",
-			})
+			ResponseError(c, CodeInvalidParam)
 		} else {
-			c.JSON(http.StatusOK, gin.H{
-				"msg": removeTopStruct(errs.Translate(trans)),
-			})
+			ResponseErrorWithMsg(c, CodeInvalidParam, removeTopStruct(errs.Translate(trans)))
 		}
 		return
 	}
 
 	//2.业务处理
 	if err := logic.SignUp(p); err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"msg": "注册失败",
-		})
+		ResponseErrorWithMsg(c, CodeInvalidParam, "注册失败")
 		return
 	}
 
 	//3.返回响应
-	c.JSON(http.StatusOK, gin.H{
-		"msg": "request success",
-	})
+	ResponseSuccess(c, nil)
 }
 
 // LoginHandler 处理登录的函数
@@ -56,27 +47,19 @@ func LoginHandler(c *gin.Context) {
 		//判断是否为验证型错误
 		errs, ok := err.(validator.ValidationErrors)
 		if !ok {
-			c.JSON(http.StatusOK, gin.H{
-				"msg": "invalid login param",
-			})
+			ResponseError(c, CodeInvalidParam)
 		} else {
-			c.JSON(http.StatusOK, gin.H{
-				"msg": removeTopStruct(errs.Translate(trans)),
-			})
+			ResponseErrorWithMsg(c, CodeInvalidParam, removeTopStruct(errs.Translate(trans)))
 		}
 		return
 	}
 
 	//登录逻辑
 	if err := logic.Login(p); err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"msg": "登录失败",
-		})
+		ResponseErrorWithMsg(c, CodeInvalidPassword, "登录失败")
 		return
 	}
 
 	//返回响应
-	c.JSON(http.StatusOK, gin.H{
-		"msg": "request success",
-	})
+	ResponseSuccess(c, nil)
 }
