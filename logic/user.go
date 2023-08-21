@@ -3,9 +3,9 @@ package logic
 import (
 	"bluebell/dao/mysql"
 	"bluebell/models"
+	"bluebell/pkg/jwt"
 	"bluebell/pkg/snowflake"
 	"errors"
-	"fmt"
 )
 
 func SignUp(p *models.ParamSignUp) (err error) {
@@ -13,7 +13,6 @@ func SignUp(p *models.ParamSignUp) (err error) {
 	var exist bool
 	exist, err = mysql.CheckUserExistByUsername(p.Username)
 	if err != nil {
-		fmt.Printf("Error:%v", err)
 		return err
 	}
 
@@ -43,11 +42,15 @@ func SignUp(p *models.ParamSignUp) (err error) {
 	return nil
 }
 
-func Login(p *models.ParamLogin) (err error) {
-	//检测用户密码是否匹配
-	if err = mysql.Login(p.Username, p.Password); err != nil {
-		return err
+func Login(p *models.ParamLogin) (token string, err error) {
+	user := &models.User{
+		Username: p.Username,
+		Password: p.Password,
 	}
-	//TODO 设置session
-	return nil
+	//检测用户密码是否匹配
+	if err = mysql.Login(user); err != nil {
+		return "", err
+	}
+
+	return jwt.GenToken(user.UserId, user.Username)
 }

@@ -55,11 +55,12 @@ func LoginHandler(c *gin.Context) {
 	}
 
 	//登录逻辑
-	if err := logic.Login(p); err != nil {
+	token, err := logic.Login(p)
+	if err != nil {
+		zap.L().Error("logic.login failed", zap.String("username", p.Username))
 		ResponseErrorWithMsg(c, CodeInvalidPassword, "登录失败")
 		return
 	}
-
 	//返回响应
-	ResponseSuccess(c, nil)
+	ResponseSuccess(c, token)
 }

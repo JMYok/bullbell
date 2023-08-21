@@ -63,16 +63,19 @@ func InsertUser(user *models.User) (err error) {
 	return nil
 }
 
-func Login(username string, password string) (err error) {
-	password = encryptPassword(password)
-	sqlStr := "select count(*) from user where username=? and password = ?"
-	var cnt int
-	err = db.Get(&cnt, sqlStr, username, password)
+func Login(user *models.User) (err error) {
+	username := user.Username
+	password := encryptPassword(user.Password)
+	sqlStr := "select user_id from user where username=? and password = ?"
+	var uid uint64
+	err = db.Get(&uid, sqlStr, username, password)
 	if err != nil {
 		zap.L().Error("mysql Login error message", zap.Error(err))
 		return err
 	}
-	if cnt <= 0 {
+
+	user.UserId = uid
+	if user.UserId == 0 {
 		zap.L().Error("数据库查询结果为0", zap.String("username", username))
 		return errors.New("密码不匹配")
 	}

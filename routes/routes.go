@@ -3,6 +3,7 @@ package routes
 import (
 	"bluebell/controllers"
 	"bluebell/logger"
+	"bluebell/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,8 +20,8 @@ func Setup(mode string) *gin.Engine {
 	//登录
 	r.POST("/login", controllers.LoginHandler)
 
-	r.GET("/ping", func(c *gin.Context) {
-		c.String(200, "server work nicely")
+	r.GET("/ping", middleware.JWTAuthMiddleware(), func(c *gin.Context) {
+		c.String(200, "pong")
 	})
 	return r
 }
