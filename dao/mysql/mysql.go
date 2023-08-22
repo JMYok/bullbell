@@ -63,6 +63,16 @@ func InsertUser(user *models.User) (err error) {
 	return nil
 }
 
+// GetUserByUserId 根据userId获得user
+func GetUserByUserId(user *models.User) (err error) {
+	sqlStr := "select user_id,username,email from user where user_id = ?"
+	err = db.Get(&user, sqlStr, user.UserId)
+	if err != nil {
+		return errors.New("用户不存在")
+	}
+	return nil
+}
+
 func Login(user *models.User) (err error) {
 	username := user.Username
 	password := encryptPassword(user.Password)
