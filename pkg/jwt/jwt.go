@@ -6,7 +6,9 @@ import (
 	"time"
 )
 
-const TokenExpireDuration = time.Hour * 2
+const AccessTokenExpireDuration = 30 * time.Second
+const RefreshTokenExpireDuration = 30 * time.Minute
+const InvalidToken = "invalid token"
 
 var MySecret = []byte("BobJiang的高盐值")
 
@@ -21,20 +23,28 @@ type MyClaims struct {
 }
 
 // GenToken 生成JWT
-func GenToken(userid uint64, username string) (string, error) {
+func GenToken(userid uint64, username string) (accessToken, refreshToken string, err error) {
 	// 创建一个我们自己的声明
 	c := MyClaims{
 		UserId:   userid, // 自定义字段
 		UserName: username,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(TokenExpireDuration).Unix(), // 过期时间
-			Issuer:    "BobJiang",                                 // 签发人
+			ExpiresAt: time.Now().Add(AccessTokenExpireDuration).Unix(), // 过期时间
+			Issuer:    "BobJiang",                                       // 签发人
 		},
 	}
 	// 使用指定的签名方法创建签名对象
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, c)
 	// 使用指定的secret签名并获得完整的编码后的字符串token
-	return token.SignedString(MySecret)
+	accessToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, c).SignedString(MySecret)
+	refreshToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		ExpiresAt: time.Now().Add(RefreshTokenExpireDuration).Unix(), //过期时间
+		Issuer:    "BobJiang",
+	}).SignedString(MySecret)
+	if err != nil {
+		return "", "", errors.New(InvalidToken)
+	}
+
+	return accessToken, refreshToken, nil
 }
 
 // ParseToken 解析JWT
@@ -49,5 +59,27 @@ func ParseToken(tokenString string) (*MyClaims, error) {
 	if claims, ok := token.Claims.(*MyClaims); ok && token.Valid { // 校验token
 		return claims, nil
 	}
-	return nil, errors.New("invalid token")
+	return nil, errors.New(InvalidToken)
+}
+
+func RefreshToken(accessToken, refreshToken string) (newAToken, newRToken string, err error) {
+	//refresh token是否有效
+	if _, err = jwt.Parse(refreshToken, func(token *jwt.Token) (i interface{}, err error) {
+		return MySecret, nil
+	}); err != nil {
+		return
+	}
+
+	//从旧access token中解析出claims数据
+	var claims MyClaims
+	_, err = jwt.ParseWithClaims(accessToken, &claims, func(token *jwt.Token) (i interface{}, err error) {
+		return MySecret, nil
+	})
+	v, _ := err.(*jwt.ValidationError)
+
+	//access token过期
+	if v.Errors == jwt.ValidationErrorExpired {
+		return GenToken(claims.UserId, claims.UserName)
+	}
+	return
 }

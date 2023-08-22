@@ -55,12 +55,25 @@ func LoginHandler(c *gin.Context) {
 	}
 
 	//登录逻辑
-	token, err := logic.Login(p)
+	accessToken, refreshToken, err := logic.Login(p)
 	if err != nil {
 		zap.L().Error("logic.login failed", zap.String("username", p.Username))
 		ResponseErrorWithMsg(c, CodeInvalidPassword, "登录失败")
 		return
 	}
 	//返回响应
-	ResponseSuccess(c, token)
+	ResponseSuccess(c, accessToken, refreshToken)
+}
+
+// RefreshTokenHandler 刷新access token
+func RefreshTokenHandler(c *gin.Context) {
+	type param struct {
+		AccessToken  string `json:"access_token"`
+		RefreshToken string `json:"refresh_token"`
+	}
+	p := new(param)
+	c.BindJSON(&p)
+	newAtoken, newRToken := logic.RefreshToken(p.AccessToken, p.RefreshToken)
+	//返回响应
+	ResponseSuccess(c, newAtoken, newRToken)
 }

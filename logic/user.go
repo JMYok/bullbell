@@ -39,18 +39,23 @@ func SignUp(p *models.ParamSignUp) (err error) {
 	}
 
 	//返回结果
-	return nil
+	return
 }
 
-func Login(p *models.ParamLogin) (token string, err error) {
+func Login(p *models.ParamLogin) (accessToken, refreshToken string, err error) {
 	user := &models.User{
 		Username: p.Username,
 		Password: p.Password,
 	}
 	//检测用户密码是否匹配
 	if err = mysql.Login(user); err != nil {
-		return "", err
+		return
 	}
 
 	return jwt.GenToken(user.UserId, user.Username)
+}
+
+func RefreshToken(aToken, rToken string) (newAToken, newRToken string) {
+	newAToken, newRToken, _ = jwt.RefreshToken(aToken, rToken)
+	return newAToken, newRToken
 }

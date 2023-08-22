@@ -20,6 +20,9 @@ func Setup(mode string) *gin.Engine {
 	//登录
 	r.POST("/login", controllers.LoginHandler)
 
+	//刷新token
+	r.POST("/refresh_token", controllers.RefreshTokenHandler)
+
 	r.GET("/ping", middleware.JWTAuthMiddleware(), func(c *gin.Context) {
 		c.String(200, "pong")
 	})
