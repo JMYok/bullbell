@@ -15,10 +15,13 @@ func Setup(mode string) *gin.Engine {
 	r := gin.New()
 	r.Use(logger.GinLogger(), logger.GinRecovery(true))
 
-	//注册
-	r.POST("/signup", controllers.SignUpHandler)
-	//登录
-	r.POST("/login", controllers.LoginHandler)
+	v1 := r.Group("/api/v1")
+	{
+		//注册
+		v1.POST("/signup", controllers.SignUpHandler)
+		//登录
+		v1.POST("/login", controllers.LoginHandler)
+	}
 
 	//刷新token
 	r.POST("/refresh_token", controllers.RefreshTokenHandler)
