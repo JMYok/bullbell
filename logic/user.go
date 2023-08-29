@@ -42,7 +42,7 @@ func SignUp(p *models.ParamSignUp) (err error) {
 	return
 }
 
-func Login(p *models.ParamLogin) (accessToken, refreshToken string, err error) {
+func Login(p *models.ParamLogin) (loginRes *models.LoginRes, err error) {
 	user := &models.User{
 		Username: p.Username,
 		Password: p.Password,
@@ -51,8 +51,19 @@ func Login(p *models.ParamLogin) (accessToken, refreshToken string, err error) {
 	if err = mysql.Login(user); err != nil {
 		return
 	}
+	accessToken, refreshToken, err := jwt.GenToken(user.UserId, user.Username)
+	if err != nil {
+		return
+	}
 
-	return jwt.GenToken(user.UserId, user.Username)
+	loginRes = &models.LoginRes{
+		Username:     user.Username,
+		UserId:       user.UserId,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
+
+	return loginRes, nil
 }
 
 func RefreshToken(aToken, rToken string) (newAToken, newRToken string) {

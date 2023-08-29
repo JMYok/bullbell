@@ -12,3 +12,10 @@ type ParamLogin struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required" min:"4" max:"100"`
 }
+
+type LoginRes struct {
+	Username     string `json:"username"`
+	UserId       uint64 `json:"userId"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+}

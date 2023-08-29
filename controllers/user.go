@@ -55,14 +55,14 @@ func LoginHandler(c *gin.Context) {
 	}
 
 	//登录逻辑
-	accessToken, refreshToken, err := logic.Login(p)
+	loginRes, err := logic.Login(p)
 	if err != nil {
 		zap.L().Error("logic.login failed", zap.String("username", p.Username))
 		ResponseErrorWithMsg(c, CodeInvalidPassword, "登录失败")
 		return
 	}
 	//返回响应
-	ResponseSuccess(c, accessToken, refreshToken)
+	ResponseSuccess(c, loginRes)
 }
 
 // RefreshTokenHandler 刷新access token
