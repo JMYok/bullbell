@@ -21,6 +21,9 @@ func Setup(mode string) *gin.Engine {
 		v1.POST("/signup", controllers.SignUpHandler)
 		//登录
 		v1.POST("/login", controllers.LoginHandler)
+
+		//所有博客
+		v1.GET("/posts2", controllers.AllPostsHandler)
 	}
 
 	//刷新token
