@@ -15,8 +15,8 @@ type ParamLogin struct {
 
 // LoginRes 结果参数结构体
 type LoginRes struct {
-	Username     string `json:"username"`
-	UserId       uint64 `json:"userId"`
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
+	Username     string `json:"user_name"`
+	UserId       uint64 `json:"user_id"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
