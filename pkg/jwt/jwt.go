@@ -1,13 +1,12 @@
 package jwt
 
 import (
+	"bluebell/settings"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
 
-const AccessTokenExpireDuration = 30 * time.Second
-const RefreshTokenExpireDuration = 30 * time.Minute
 const InvalidToken = "invalid token"
 
 var MySecret = []byte("BobJiang的高盐值")
@@ -29,15 +28,15 @@ func GenToken(userid uint64, username string) (accessToken, refreshToken string,
 		UserId:   userid, // 自定义字段
 		UserName: username,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(AccessTokenExpireDuration).Unix(), // 过期时间
-			Issuer:    "BobJiang",                                       // 签发人
+			ExpiresAt: time.Now().Add(time.Duration(settings.Conf.AccessTokenExpire) * time.Minute).Unix(), // 过期时间
+			Issuer:    "BobJiang",                                                                          // 签发人
 		},
 	}
 	// 使用指定的签名方法创建签名对象
 	// 使用指定的secret签名并获得完整的编码后的字符串token
 	accessToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, c).SignedString(MySecret)
 	refreshToken, err = jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(RefreshTokenExpireDuration).Unix(), //过期时间
+		ExpiresAt: time.Now().Add(time.Duration(settings.Conf.RefreshTokenExpire) * time.Minute).Unix(), //过期时间
 		Issuer:    "BobJiang",
 	}).SignedString(MySecret)
 	if err != nil {

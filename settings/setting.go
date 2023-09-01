@@ -20,6 +20,12 @@ type AppConfig struct {
 	*LogConfig   `mapstructure:"log"`
 	*MySQLConfig `mapstructure:"mysql"`
 	*RedisConfig `mapstructure:"redis"`
+	*JwtConfig   `mapstructure:"auth"`
+}
+
+type JwtConfig struct {
+	AccessTokenExpire  uint `mapstructure:"jwt_expire"`
+	RefreshTokenExpire uint `mapstructure:"jwt_refresh_expire"`
 }
 
 type LogConfig struct {

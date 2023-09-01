@@ -16,15 +16,19 @@ func Setup(mode string) *gin.Engine {
 	r.Use(logger.GinLogger(), logger.GinRecovery(true))
 
 	v1 := r.Group("/api/v1")
-	{
-		//注册
-		v1.POST("/signup", controllers.SignUpHandler)
-		//登录
-		v1.POST("/login", controllers.LoginHandler)
 
-		//所有博客
-		v1.GET("/posts2", controllers.AllPostsHandler)
+	//注册
+	v1.POST("/signup", controllers.SignUpHandler)
+	//登录
+	v1.POST("/login", controllers.LoginHandler)
+
+	v1.Use(middleware.JWTAuthMiddleware())
+	{
+		v1.GET("/community", controllers.CommunityHandler)
 	}
+
+	//所有博客
+	v1.GET("/posts2", controllers.AllPostsHandler)
 
 	//刷新token
 	r.POST("/refresh_token", controllers.RefreshTokenHandler)

@@ -13,6 +13,10 @@
     "max_age": 30,
     "max_backups": 7
   },
+  "auth": {
+    "jwt_expire": 8760,
+    "jwt_refresh_expire": 26280
+  },
   "mysql": {
     "host": "127.0.0.1",
     "port": 3306,
