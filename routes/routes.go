@@ -24,12 +24,18 @@ func Setup(mode string) *gin.Engine {
 
 	v1.Use(middleware.JWTAuthMiddleware())
 	{
+		//-----------------------community------------------------
+
 		v1.GET("/community", controllers.CommunityHandler)
 		v1.GET("/community/:cid", controllers.CommunityDetailHandler)
+
+		//-----------------------post------------------------
+		v1.POST("/post", controllers.CreatePostHandler)
+
 	}
 
 	//所有博客
-	v1.GET("/posts2", controllers.AllPostsHandler)
+	v1.GET("/posts", controllers.AllPostsHandler)
 
 	//刷新token
 	r.POST("/refresh_token", controllers.RefreshTokenHandler)

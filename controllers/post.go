@@ -2,8 +2,25 @@ package controllers
 
 import (
 	"bluebell/logic"
+	"bluebell/models"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
+
+func CreatePostHandler(c *gin.Context) {
+	p := new(models.ParamPostRequest)
+	if err := c.ShouldBindJSON(p); err != nil {
+		zap.L().Error("ParamPostRequest wrong", zap.Error(err))
+		ResponseErrorWithMsg(c, CodeInvalidParam, CodeInvalidParam.Msg())
+		return
+	}
+	err := logic.CreatePost(p)
+	if err != nil {
+		ResponseError(c, CodeServerBusy)
+		return
+	}
+	ResponseSuccess(c, CodeSuccess)
+}
 
 func AllPostsHandler(c *gin.Context) {
 	//验证参数

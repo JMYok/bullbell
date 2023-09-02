@@ -20,3 +20,11 @@ type LoginRes struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
+
+// ParamPostRequest 请求参数结构体
+type ParamPostRequest struct {
+	Title       string `json:"title" binding:"required"`
+	Content     string `json:"content" binding:"required"`
+	AuthorId    int64  `json:"author_id" binding:"required"`
+	CommunityId int64  `json:"community_id" binding:"required"`
+}
