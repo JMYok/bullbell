@@ -25,6 +25,7 @@ func Setup(mode string) *gin.Engine {
 	v1.Use(middleware.JWTAuthMiddleware())
 	{
 		v1.GET("/community", controllers.CommunityHandler)
+		v1.GET("/community/:cid", controllers.CommunityDetailHandler)
 	}
 
 	//所有博客

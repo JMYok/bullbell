@@ -4,6 +4,7 @@ import (
 	"bluebell/controllers"
 	"bluebell/pkg/jwt"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"strings"
 )
 
@@ -30,6 +31,7 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 		// parts[1]是获取到的tokenString，我们使用之前定义好的解析JWT的函数来解析它
 		mc, err := jwt.ParseToken(parts[1])
 		if err != nil {
+			zap.L().Error("Invalid Auth:", zap.Error(err))
 			controllers.ResponseError(c, controllers.CodeAuthInvalid)
 			c.Abort()
 			return

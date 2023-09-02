@@ -5,7 +5,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"go.uber.org/zap"
 )
 
@@ -16,6 +15,7 @@ func CheckUserExistByUsername(username string) (bool, error) {
 	var cnt int
 	err := db.Get(&cnt, sqlStr, username)
 	if err != nil {
+		zap.L().Error("There exist user", zap.Error(ErrorUserNotExist))
 		return true, err
 	}
 	return cnt > 0, nil
@@ -29,8 +29,8 @@ func InsertUser(user *models.User) (err error) {
 	sqlStr := "insert into user(user_id,username,password) values(?,?,?)"
 	_, err = db.Exec(sqlStr, user.UserId, user.Username, password)
 	if err != nil {
-		fmt.Printf("Error:%v", err)
-		return errors.New("插入数据出错")
+		err = errors.New("插入数据出错")
+		return err
 	}
 	return nil
 }
@@ -40,7 +40,8 @@ func GetUserByUserId(user *models.User) (err error) {
 	sqlStr := "select user_id,username,email from user where user_id = ?"
 	err = db.Get(&user, sqlStr, user.UserId)
 	if err != nil {
-		return errors.New("用户不存在")
+		zap.L().Error("User not Exist", zap.Error(ErrorUserNotExist))
+		return ErrorUserNotExist
 	}
 	return nil
 }
@@ -52,14 +53,14 @@ func Login(user *models.User) (err error) {
 	var uid uint64
 	err = db.Get(&uid, sqlStr, username, password)
 	if err != nil {
-		zap.L().Error("mysql Login error message", zap.Error(err))
-		return err
+		zap.L().Error("mysql Login error message", zap.Error(ErrorInvalidPassword))
+		return ErrorInvalidPassword
 	}
 
 	user.UserId = uid
 	if user.UserId == 0 {
 		zap.L().Error("数据库查询结果为0", zap.String("username", username))
-		return errors.New("密码不匹配")
+		return ErrorInvalidPassword
 	}
 	return nil
 }

@@ -12,3 +12,11 @@ func GetCommunityList() ([]*models.Community, error) {
 	}
 	return data, nil
 }
+
+func GetCommunityDetailByCid(cid int) (communities []*models.CommunityDetail, err error) {
+	communities, err = mysql.GetCommunityDetailByCid(cid)
+	if err != nil {
+		return nil, err
+	}
+	return communities, nil
+}
