@@ -29,8 +29,10 @@ func Setup(mode string) *gin.Engine {
 		v1.GET("/community", controllers.CommunityHandler)
 		v1.GET("/community/:cid", controllers.CommunityDetailHandler)
 
-		//-----------------------post------------------------
+		//-----------------------post------------------------------
+
 		v1.POST("/post", controllers.CreatePostHandler)
+		v1.GET("/post/:pid", controllers.PostDetailHandler)
 
 	}
 

@@ -2,11 +2,25 @@ package mysql
 
 import (
 	"bluebell/models"
+	"database/sql"
 	"errors"
 	"go.uber.org/zap"
 )
 
 /*--------------------------Post------------------------*/
+
+func GetPostDetailById(pid uint64) (postDetail *models.Post, err error) {
+	sqlSql := "select post_id,title,content,author_id,community_id,create_time,update_time from post where post_id = ?"
+	postDetail = new(models.Post)
+	err = db.Get(postDetail, sqlSql, pid)
+	if err == sql.ErrNoRows {
+		return nil, err
+	} else if err != nil {
+		zap.L().Error("Db failure", zap.Error(err))
+		return nil, err
+	}
+	return postDetail, nil
+}
 
 func CreatePost(p *models.Post) (err error) {
 	sqlStr := "insert into post (post_id,title,content,author_id,community_id) values (?,?,?,?,?)"

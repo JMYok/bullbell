@@ -19,18 +19,18 @@ func CommunityHandler(c *gin.Context) {
 
 func CommunityDetailHandler(c *gin.Context) {
 	cidStr := c.Param("cid")
-	cid, err := strconv.Atoi(cidStr)
+	cid, err := strconv.ParseUint(cidStr, 10, 64)
 	if err != nil {
 		zap.L().Error("cid string convert failed", zap.Error(err))
 		ResponseError(c, CodeAuthInvalid)
 		return
 	}
 
-	communities, err := logic.GetCommunityDetailByCid(cid)
+	community, err := logic.GetCommunityDetailByCid(cid)
 	if err != nil {
-		zap.L().Error("logic.GetCommunityList() failed", zap.Error(err))
+		zap.L().Error("logic.GetCommunityDetailByCid() failed", zap.Error(err))
 		ResponseError(c, CodeServerBusy)
 		return
 	}
-	ResponseSuccess(c, communities)
+	ResponseSuccess(c, community)
 }

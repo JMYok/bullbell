@@ -36,14 +36,14 @@ func InsertUser(user *models.User) (err error) {
 }
 
 // GetUserByUserId 根据userId获得user
-func GetUserByUserId(user *models.User) (err error) {
-	sqlStr := "select user_id,username,email from user where user_id = ?"
-	err = db.Get(&user, sqlStr, user.UserId)
+func GetUserByUserId(user *models.User) (*models.User, error) {
+	sqlStr := "select user_id,username from user where user_id = ?"
+	err := db.Get(user, sqlStr, user.UserId)
 	if err != nil {
-		zap.L().Error("User not Exist", zap.Error(ErrorUserNotExist))
-		return ErrorUserNotExist
+		zap.L().Error("User not Exist", zap.Error(err))
+		return nil, ErrorUserNotExist
 	}
-	return nil
+	return user, nil
 }
 
 func Login(user *models.User) (err error) {

@@ -5,7 +5,29 @@ import (
 	"bluebell/models"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"strconv"
 )
+
+func PostDetailHandler(c *gin.Context) {
+	//得到post id
+	pidStr := c.Param("pid")
+	pid, err := strconv.ParseUint(pidStr, 10, 64)
+	if err != nil {
+		zap.L().Error("ParseUint failed", zap.Error(err))
+		ResponseError(c, CodeServerBusy)
+		return
+	}
+
+	//获得postDetail
+	postDetail, err := logic.GetPostDetailById(pid)
+	if err != nil {
+		zap.L().Error("Get post detail by id failed", zap.Error(err))
+		ResponseError(c, CodeServerBusy)
+		return
+	}
+	//返回
+	ResponseSuccess(c, postDetail)
+}
 
 func CreatePostHandler(c *gin.Context) {
 	p := new(models.ParamPostRequest)

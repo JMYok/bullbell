@@ -20,7 +20,7 @@ func GetCurrentUser(c *gin.Context) (user *models.User, err error) {
 	user = &models.User{
 		UserId: userId.(uint64),
 	}
-	err = mysql.GetUserByUserId(user)
+	user, err = mysql.GetUserByUserId(user)
 	if err != nil {
 		return
 	}

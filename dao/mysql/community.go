@@ -19,9 +19,10 @@ func GetCommunityList() ([]*models.Community, error) {
 	return communities, nil
 }
 
-func GetCommunityDetailByCid(cid int) (communities []*models.CommunityDetail, err error) {
+func GetCommunityDetailByCid(cid uint64) (community *models.CommunityDetail, err error) {
 	sqlStr := "select community_id,community_name,introduction,create_time,update_time from community where community_id = ?"
-	err = db.Select(&communities, sqlStr, cid)
+	community = new(models.CommunityDetail)
+	err = db.Get(community, sqlStr, cid)
 	if err == sql.ErrNoRows {
 		zap.L().Warn("there is no community in db", zap.Error(err))
 		return nil, err
@@ -29,5 +30,5 @@ func GetCommunityDetailByCid(cid int) (communities []*models.CommunityDetail, er
 		zap.L().Error("there is error in db", zap.Error(err))
 		return nil, err
 	}
-	return communities, nil
+	return community, nil
 }
