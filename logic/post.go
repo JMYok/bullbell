@@ -55,7 +55,7 @@ func CreatePost(p *models.ParamPostRequest) (err error) {
 	return nil
 }
 
-func GetAllPostsByPageAndOrder(page int, order string) (posts []models.Post, err error) {
+func GetAllPostsByPageAndOrder(page int, order string) (posts []*models.Post, err error) {
 	if order == OrderOption {
 		order = OrderRule
 	}
