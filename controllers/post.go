@@ -14,12 +14,14 @@ func CreatePostHandler(c *gin.Context) {
 		ResponseErrorWithMsg(c, CodeInvalidParam, CodeInvalidParam.Msg())
 		return
 	}
+	currentUser, _ := GetCurrentUser(c)
+	p.AuthorId = currentUser.UserId
 	err := logic.CreatePost(p)
 	if err != nil {
 		ResponseError(c, CodeServerBusy)
 		return
 	}
-	ResponseSuccess(c, CodeSuccess)
+	ResponseSuccess(c, nil)
 }
 
 func AllPostsHandler(c *gin.Context) {
