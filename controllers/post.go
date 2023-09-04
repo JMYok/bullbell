@@ -62,6 +62,7 @@ func AllPostsHandler(c *gin.Context) {
 	//处理逻辑
 	posts, err := logic.GetAllPostsByPageAndOrder(p.Page, p.Order)
 	if err != nil {
+		zap.L().Error("logic.GetAllPostsByPageAndOrder failed", zap.Error(err))
 		ResponseErrorWithMsg(c, CodeServerBusy, CodeServerBusy.Msg())
 		return
 	}
