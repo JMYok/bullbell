@@ -25,6 +25,6 @@ type LoginRes struct {
 type ParamPostRequest struct {
 	Title       string `json:"title" binding:"required"`
 	Content     string `json:"content" binding:"required"`
-	AuthorId    uint64 `json:"author_id"`
-	CommunityId uint64 `json:"community_id" binding:"required"`
+	AuthorId    uint64 `json:"author_id,string"`
+	CommunityId uint64 `json:"community_id,string" binding:"required"`
 }
