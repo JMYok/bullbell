@@ -28,3 +28,10 @@ type ParamPostRequest struct {
 	AuthorId    uint64 `json:"author_id"`
 	CommunityId uint64 `json:"community_id" binding:"required"`
 }
+
+// ParamVoteData 投票数据
+type ParamVoteData struct {
+	//UserID 请求中获取
+	PostID    int64 `json:"post_id,string" binding:"required"`
+	Direction int8  `json:"direction,string" binding:"required,oneof=-1 0 1" ` // 赞成票(1) 反对票(-1) 取消投票(0)
+}

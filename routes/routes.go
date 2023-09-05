@@ -34,6 +34,8 @@ func Setup(mode string) *gin.Engine {
 		v1.POST("/post", controllers.CreatePostHandler)
 		v1.GET("/post/:pid", controllers.PostDetailHandler)
 
+		v1.POST("/vote", controllers.PostVoteHandler)
+
 	}
 
 	//所有博客
