@@ -40,6 +40,7 @@ func GetPostDetailById(pid uint64) (apiPostDetail *models.ApiPostDetail, err err
 
 func CreatePost(p *models.ParamPostRequest) (err error) {
 	postId, _ := snowflake.GetID()
+
 	param := &models.Post{
 		Id:          postId,
 		Title:       p.Title,
