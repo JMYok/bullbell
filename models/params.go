@@ -35,3 +35,10 @@ type ParamVoteData struct {
 	PostID    int64 `json:"post_id,string" binding:"required"`
 	Direction int8  `json:"direction,string" binding:"required,oneof=-1 0 1" ` // 赞成票(1) 反对票(-1) 取消投票(0)
 }
+
+// ParamPostList 请求post参数
+type ParamPostList struct {
+	Page  int    `json:"page" form:"page"`
+	Size  int    `json:"size" form:"size"`
+	Order string `json:"order" form:"order"`
+}

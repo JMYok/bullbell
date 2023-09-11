@@ -56,11 +56,8 @@ func CreatePost(p *models.ParamPostRequest) (err error) {
 	return nil
 }
 
-func GetAllPostsByPageAndOrder(page int, order string) (posts []*models.Post, err error) {
-	if order == OrderOption {
-		order = OrderRule
-	}
-	posts, err = mysql.GetAllPostsByPageAndOrder(PageSize, page, order)
+func GetAllPosts(p *models.ParamPostList) (posts []*models.Post, err error) {
+	posts, err = mysql.GetAllPostsByPageAndOrder(PageSize, p.Page, p.Order)
 	if err != nil {
 		return nil, err
 	}
