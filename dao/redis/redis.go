@@ -7,12 +7,14 @@ import (
 	"go.uber.org/zap"
 )
 
-// 声明一个全局的rdb变量
-var rdb *redis.Client
+var (
+	client *redis.Client
+	Nil    = redis.Nil
+)
 
 // Init 初始化连接
 func Init(cfg *settings.RedisConfig) (err error) {
-	rdb = redis.NewClient(&redis.Options{
+	client = redis.NewClient(&redis.Options{
 		Addr: fmt.Sprintf("%s:%d",
 			cfg.Host,
 			cfg.Port),
@@ -22,7 +24,7 @@ func Init(cfg *settings.RedisConfig) (err error) {
 		PoolSize: cfg.PoolSize,
 	})
 
-	_, err = rdb.Ping().Result()
+	_, err = client.Ping().Result()
 	if err != nil {
 		zap.L().Error("redis connect failed", zap.Error(err))
 		return err
@@ -31,5 +33,5 @@ func Init(cfg *settings.RedisConfig) (err error) {
 }
 
 func Close() {
-	_ = rdb.Close()
+	_ = client.Close()
 }

@@ -2,6 +2,7 @@ package logic
 
 import (
 	"bluebell/dao/mysql"
+	"bluebell/dao/redis"
 	"bluebell/models"
 	"bluebell/pkg/snowflake"
 	"go.uber.org/zap"
@@ -51,6 +52,12 @@ func CreatePost(p *models.ParamPostRequest) (err error) {
 	err = mysql.CreatePost(param)
 	if err != nil {
 		zap.L().Error("Create Post wrong", zap.Error(err))
+		return err
+	}
+
+	err = redis.CreatePost(postId)
+	if err != nil {
+		zap.L().Error("Create Post in redis wrong", zap.Error(err))
 		return err
 	}
 	return nil
