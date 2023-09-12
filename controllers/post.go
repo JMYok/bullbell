@@ -8,6 +8,11 @@ import (
 	"strconv"
 )
 
+const (
+	orderTime  = "create_time"
+	orderScore = "score"
+)
+
 func PostDetailHandler(c *gin.Context) {
 	//得到post id
 	pidStr := c.Param("pid")
@@ -47,20 +52,20 @@ func CreatePostHandler(c *gin.Context) {
 }
 
 func AllPostsHandler(c *gin.Context) {
-	//验证参数
-	type param struct {
-		Page  int    `form:"page" binding:"required"`
-		Order string `form:"order" binding:"required"`
+	p := &models.ParamPostList{
+		Page:  1,
+		Size:  10,
+		Order: orderTime,
 	}
-	var p param
 
 	if err := c.ShouldBind(&p); err != nil {
+		zap.L().Error("AllPostsHandler ShouldBind failed", zap.Error(err))
 		ResponseErrorWithMsg(c, CodeInvalidParam, CodeInvalidParam.Msg())
 		return
 	}
 
 	//处理逻辑
-	posts, err := logic.GetAllPostsByPageAndOrder(p.Page, p.Order)
+	posts, err := logic.GetAllPosts(p)
 	if err != nil {
 		zap.L().Error("logic.GetAllPostsByPageAndOrder failed", zap.Error(err))
 		ResponseErrorWithMsg(c, CodeServerBusy, CodeServerBusy.Msg())
