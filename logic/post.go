@@ -77,9 +77,12 @@ func GetAllPosts(p *models.ParamPostList) (postList []*models.ApiPostDetail, err
 		return
 	}
 
+	//提前查询好每篇帖子的投票数
+	voteData, err := redis.GetPostVoteData(ids)
+
 	// 将帖子作者及分区信息查询出来填充到帖子中
 	postList = make([]*models.ApiPostDetail, 0, len(posts))
-	for _, post := range posts {
+	for idx, post := range posts {
 		user, err := mysql.GetUserByUserId(&models.User{UserId: post.AuthorId})
 		if err != nil {
 			zap.L().Error("Get User By id failed", zap.Error(err))
@@ -93,6 +96,7 @@ func GetAllPosts(p *models.ParamPostList) (postList []*models.ApiPostDetail, err
 		}
 		postDetail := &models.ApiPostDetail{
 			AuthorName:      user.Username,
+			VoteNum:         voteData[idx],
 			CommunityDetail: community,
 			Post:            post,
 		}

@@ -47,6 +47,7 @@ func CreatePostHandler(c *gin.Context) {
 }
 
 func AllPostsHandler(c *gin.Context) {
+	//指定参数默认值
 	p := &models.ParamPostList{
 		Page:  1,
 		Size:  10,

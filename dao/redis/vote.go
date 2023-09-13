@@ -3,6 +3,7 @@ package redis
 import (
 	"errors"
 	"github.com/go-redis/redis"
+	"go.uber.org/zap"
 	"math"
 	"time"
 )
@@ -14,6 +15,7 @@ const (
 
 var (
 	ErrVoteTimeExpire = errors.New("投票时间已过")
+	ErrVoteRepeat     = errors.New("不允许重复投票")
 )
 
 /**
@@ -47,6 +49,11 @@ func VoteForPost(userID, postID string, currentValue float64) (err error) {
 	//2.更新帖子的分数
 	//查询当前用户给当前帖子的投票记录(-1 0 1)
 	oldValue := client.ZScore(getRedisKey(KeyPostVotedZSetPrefix+postID), userID).Val()
+
+	if oldValue == currentValue {
+		zap.L().Warn("重复投票")
+		return ErrVoteRepeat
+	}
 
 	//控制分数的增减
 	var op float64
