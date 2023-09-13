@@ -4,7 +4,9 @@ import (
 	"bluebell/models"
 	"database/sql"
 	"errors"
+	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
+	"strings"
 )
 
 /*--------------------------Post------------------------*/
@@ -33,7 +35,7 @@ func CreatePost(p *models.Post) (err error) {
 	return nil
 }
 
-func GetAllPostsByPageAndOrder(pageSize int, page int, order string) (posts []*models.Post, err error) {
+func GetAllPostsByPageAndOrder(pageSize, page int64, order string) (posts []*models.Post, err error) {
 	sqlStr := "select post_id,title,content,author_id,community_id,status,create_time,update_time from post order by ? DESC limit ?,? "
 	posts = make([]*models.Post, 0, pageSize)
 	err = db.Select(&posts, sqlStr, order, (page-1)*pageSize, pageSize)
@@ -42,4 +44,27 @@ func GetAllPostsByPageAndOrder(pageSize int, page int, order string) (posts []*m
 		return nil, errors.New("数据库查询失败")
 	}
 	return posts, nil
+}
+
+// GetPostListByIDs 根据给定ids查询查询帖子数据
+func GetPostListByIDs(ids []string) (postList []*models.Post, err error) {
+	// FIND_IN_SET 提供排序序号
+	sqlStr := `select post_id,title,content,author_id,community_id,create_time from post where post_id in(?)
+	order by FIND_IN_SET(post_id,?)`
+	query, args, err := sqlx.In(sqlStr, ids, strings.Join(ids, ","))
+
+	if err != nil {
+		zap.L().Error("sqlx.In failed", zap.Error(err))
+		return nil, err
+	}
+
+	query = db.Rebind(query)
+	err = db.Select(&postList, query, args...)
+
+	if err != nil {
+		zap.L().Error("db.Select failed", zap.Error(err))
+		return nil, err
+	}
+
+	return postList, nil
 }

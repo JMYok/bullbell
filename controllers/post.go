@@ -8,11 +8,6 @@ import (
 	"strconv"
 )
 
-const (
-	orderTime  = "create_time"
-	orderScore = "score"
-)
-
 func PostDetailHandler(c *gin.Context) {
 	//得到post id
 	pidStr := c.Param("pid")
@@ -55,7 +50,7 @@ func AllPostsHandler(c *gin.Context) {
 	p := &models.ParamPostList{
 		Page:  1,
 		Size:  10,
-		Order: orderTime,
+		Order: models.OrderTime,
 	}
 
 	if err := c.ShouldBind(&p); err != nil {

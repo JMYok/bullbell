@@ -8,12 +8,6 @@ import (
 	"go.uber.org/zap"
 )
 
-const (
-	PageSize    int    = 10
-	OrderOption string = "time"
-	OrderRule          = "create_time"
-)
-
 func GetPostDetailById(pid uint64) (apiPostDetail *models.ApiPostDetail, err error) {
 	postDetail, err := mysql.GetPostDetailById(pid)
 	if err != nil {
@@ -63,10 +57,46 @@ func CreatePost(p *models.ParamPostRequest) (err error) {
 	return nil
 }
 
-func GetAllPosts(p *models.ParamPostList) (posts []*models.Post, err error) {
-	posts, err = mysql.GetAllPostsByPageAndOrder(PageSize, p.Page, p.Order)
+func GetAllPosts(p *models.ParamPostList) (postList []*models.ApiPostDetail, err error) {
+	// 在redis中查询id列表
+	ids, err := redis.GetPostIDsInOrder(p)
 	if err != nil {
-		return nil, err
+		zap.L().Error("redis.GetPostIDsInOrder 查询id失败", zap.Error(err))
+		return
 	}
-	return posts, nil
+
+	if len(ids) == 0 {
+		zap.L().Warn("ids is empty")
+		return
+	}
+
+	// 根据id去mysql数据库查询帖子详细信息
+	posts, err := mysql.GetPostListByIDs(ids)
+	if err != nil {
+		zap.L().Error("mysql.GetPostListByIDs failed", zap.Error(err))
+		return
+	}
+
+	// 将帖子作者及分区信息查询出来填充到帖子中
+	postList = make([]*models.ApiPostDetail, 0, len(posts))
+	for _, post := range posts {
+		user, err := mysql.GetUserByUserId(&models.User{UserId: post.AuthorId})
+		if err != nil {
+			zap.L().Error("Get User By id failed", zap.Error(err))
+			return nil, err
+		}
+
+		community, err := mysql.GetCommunityDetailByCid(post.CommunityId)
+		if err != nil {
+			zap.L().Error("Get community By id failed", zap.Error(err))
+			return nil, err
+		}
+		postDetail := &models.ApiPostDetail{
+			AuthorName:      user.Username,
+			CommunityDetail: community,
+			Post:            post,
+		}
+		postList = append(postList, postDetail)
+	}
+	return postList, nil
 }
