@@ -49,7 +49,7 @@ func CreatePost(p *models.ParamPostRequest) (err error) {
 		return err
 	}
 
-	err = redis.CreatePost(postId)
+	err = redis.CreatePost(postId, p.CommunityId)
 	if err != nil {
 		zap.L().Error("Create Post in redis wrong", zap.Error(err))
 		return err
@@ -64,7 +64,19 @@ func GetAllPosts(p *models.ParamPostList) (postList []*models.ApiPostDetail, err
 		zap.L().Error("redis.GetPostIDsInOrder 查询id失败", zap.Error(err))
 		return
 	}
+	return getPostListByIds(ids)
+}
 
+func GetCommunityPostList(p *models.ParamCommunityPostList) (data []*models.ApiPostDetail, err error) {
+	ids, err := redis.GetCommunityPostIDsInOrder(p)
+	if err != nil {
+		zap.L().Error("redis.GetCommunityPostIDsInOrder failed", zap.Error(err))
+		return nil, err
+	}
+	return getPostListByIds(ids)
+}
+
+func getPostListByIds(ids []string) (postList []*models.ApiPostDetail, err error) {
 	if len(ids) == 0 {
 		zap.L().Warn("ids is empty")
 		return

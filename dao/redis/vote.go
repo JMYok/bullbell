@@ -5,6 +5,7 @@ import (
 	"github.com/go-redis/redis"
 	"go.uber.org/zap"
 	"math"
+	"strconv"
 	"time"
 )
 
@@ -81,7 +82,7 @@ func VoteForPost(userID, postID string, currentValue float64) (err error) {
 	return err
 }
 
-func CreatePost(postID uint64) error {
+func CreatePost(postID, CommunityID uint64) error {
 	pipeline := client.TxPipeline()
 	//帖子时间
 	pipeline.ZAdd(getRedisKey(KeyPostTimeZSet), redis.Z{
@@ -94,6 +95,10 @@ func CreatePost(postID uint64) error {
 		Score:  float64(time.Now().Unix()),
 		Member: postID,
 	})
+
+	//update: 把帖子id加到社区的set
+	cKey := getRedisKey(KeyCommunitySetPrefix + strconv.Itoa(int(CommunityID)))
+	pipeline.SAdd(cKey, postID)
 	_, err := pipeline.Exec()
 	return err
 }

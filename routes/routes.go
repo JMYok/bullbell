@@ -40,6 +40,7 @@ func Setup(mode string) *gin.Engine {
 
 	//所有博客
 	v1.GET("/posts", controllers.AllPostsHandler)
+	v1.GET("/community_posts", controllers.GetPostListByCommunityIDHandler)
 
 	//刷新token
 	r.POST("/refresh_token", controllers.RefreshTokenHandler)

@@ -71,3 +71,33 @@ func AllPostsHandler(c *gin.Context) {
 	//返回结果
 	ResponseSuccess(c, posts)
 }
+
+// GetPostListByCommunityIDHandler 根据社区去查询帖子列表
+func GetPostListByCommunityIDHandler(c *gin.Context) {
+	//指定参数默认值
+	p := &models.ParamCommunityPostList{
+		ParamPostList: models.ParamPostList{
+			Page:  1,
+			Size:  10,
+			Order: "time",
+		},
+		CommunityID: 1,
+	}
+
+	if err := c.ShouldBind(&p); err != nil {
+		zap.L().Error("GetPostListByCommunityIDHandler ShouldBind failed", zap.Error(err))
+		ResponseErrorWithMsg(c, CodeInvalidParam, CodeInvalidParam.Msg())
+		return
+	}
+
+	//处理逻辑
+	posts, err := logic.GetCommunityPostList(p)
+	if err != nil {
+		zap.L().Error("logic.GetCommunityPostList failed", zap.Error(err))
+		ResponseErrorWithMsg(c, CodeServerBusy, CodeServerBusy.Msg())
+		return
+	}
+
+	//返回结果
+	ResponseSuccess(c, posts)
+}
