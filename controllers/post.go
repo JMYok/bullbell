@@ -53,51 +53,34 @@ func AllPostsHandler(c *gin.Context) {
 		Size:  10,
 		Order: models.OrderTime,
 	}
-
-	if err := c.ShouldBind(&p); err != nil {
+	var err error
+	if err = c.ShouldBind(&p); err != nil {
 		zap.L().Error("AllPostsHandler ShouldBind failed", zap.Error(err))
 		ResponseErrorWithMsg(c, CodeInvalidParam, CodeInvalidParam.Msg())
 		return
 	}
 
-	//处理逻辑
-	posts, err := logic.GetAllPosts(p)
-	if err != nil {
-		zap.L().Error("logic.GetAllPostsByPageAndOrder failed", zap.Error(err))
-		ResponseErrorWithMsg(c, CodeServerBusy, CodeServerBusy.Msg())
-		return
+	var posts []*models.ApiPostDetail
+
+	// 得到全部博客
+	if p.CommunityID == 0 {
+		//处理逻辑
+		posts, err = logic.GetAllPosts(p)
+		if err != nil {
+			zap.L().Error("logic.GetAllPostsByPageAndOrder failed", zap.Error(err))
+			ResponseErrorWithMsg(c, CodeServerBusy, CodeServerBusy.Msg())
+			return
+		}
+		// 得到某个社区下的全部博客
+	} else {
+		//处理逻辑
+		posts, err = logic.GetCommunityPostList(p)
+		if err != nil {
+			zap.L().Error("logic.GetCommunityPostList failed", zap.Error(err))
+			ResponseErrorWithMsg(c, CodeServerBusy, CodeServerBusy.Msg())
+			return
+		}
 	}
-
-	//返回结果
-	ResponseSuccess(c, posts)
-}
-
-// GetPostListByCommunityIDHandler 根据社区去查询帖子列表
-func GetPostListByCommunityIDHandler(c *gin.Context) {
-	//指定参数默认值
-	p := &models.ParamCommunityPostList{
-		ParamPostList: models.ParamPostList{
-			Page:  1,
-			Size:  10,
-			Order: "time",
-		},
-		CommunityID: 1,
-	}
-
-	if err := c.ShouldBind(&p); err != nil {
-		zap.L().Error("GetPostListByCommunityIDHandler ShouldBind failed", zap.Error(err))
-		ResponseErrorWithMsg(c, CodeInvalidParam, CodeInvalidParam.Msg())
-		return
-	}
-
-	//处理逻辑
-	posts, err := logic.GetCommunityPostList(p)
-	if err != nil {
-		zap.L().Error("logic.GetCommunityPostList failed", zap.Error(err))
-		ResponseErrorWithMsg(c, CodeServerBusy, CodeServerBusy.Msg())
-		return
-	}
-
 	//返回结果
 	ResponseSuccess(c, posts)
 }

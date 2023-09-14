@@ -67,7 +67,7 @@ func GetAllPosts(p *models.ParamPostList) (postList []*models.ApiPostDetail, err
 	return getPostListByIds(ids)
 }
 
-func GetCommunityPostList(p *models.ParamCommunityPostList) (data []*models.ApiPostDetail, err error) {
+func GetCommunityPostList(p *models.ParamPostList) (data []*models.ApiPostDetail, err error) {
 	ids, err := redis.GetCommunityPostIDsInOrder(p)
 	if err != nil {
 		zap.L().Error("redis.GetCommunityPostIDsInOrder failed", zap.Error(err))
