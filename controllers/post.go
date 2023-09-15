@@ -8,6 +8,17 @@ import (
 	"strconv"
 )
 
+// @BasePath /api/v1
+
+// PostDetailHandler  godoc
+// @Summary 博客详情
+// @Schemes
+// @Description 根据博客id获取博客详情
+// @Tags post
+// @Accept json
+// @Produce json
+// @Success 200 {string} data
+// @Router /api/v1//post/:pid [post]
 func PostDetailHandler(c *gin.Context) {
 	//得到post id
 	pidStr := c.Param("pid")

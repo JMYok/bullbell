@@ -1,0 +1,19 @@
+info:
+  contact: {}
+paths:
+  /api/v1//post/:pid:
+    post:
+      consumes:
+      - application/json
+      description: 根据博客id获取博客详情
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: 博客详情
+      tags:
+      - post
+swagger: "2.0"

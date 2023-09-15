@@ -2,9 +2,12 @@ package routes
 
 import (
 	"bluebell/controllers"
+	_ "bluebell/docs"
 	"bluebell/logger"
 	"bluebell/middleware"
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func Setup(mode string) *gin.Engine {
@@ -48,5 +51,7 @@ func Setup(mode string) *gin.Engine {
 	r.GET("/ping", middleware.JWTAuthMiddleware(), func(c *gin.Context) {
 		c.String(200, "pong")
 	})
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	return r
 }
