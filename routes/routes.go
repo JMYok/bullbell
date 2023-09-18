@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"time"
 )
 
 func Setup(mode string) *gin.Engine {
@@ -47,7 +48,7 @@ func Setup(mode string) *gin.Engine {
 	//刷新token
 	r.POST("/refresh_token", controllers.RefreshTokenHandler)
 
-	r.GET("/ping", middleware.JWTAuthMiddleware(), func(c *gin.Context) {
+	r.GET("/ping", middleware.RateLimitMiddleware(2*time.Second, 1), func(c *gin.Context) {
 		c.String(200, "pong")
 	})
 
